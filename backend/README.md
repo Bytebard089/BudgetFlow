@@ -109,6 +109,6 @@ The server will run on `http://localhost:5000`
 
 ### Database on Supabase
 
-1. Create a new project on Supabase
+1. Create a new project on NeonDB
 2. Copy the PostgreSQL connection string
 3. Update `DATABASE_URL` in your environment variables

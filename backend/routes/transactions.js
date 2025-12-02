@@ -23,7 +23,6 @@ router.get('/', async (req, res) => {
     const userId = req.userId;
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
-    // Build where clause
     const where = { userId };
 
     if (type) {
@@ -61,16 +60,38 @@ router.get('/', async (req, res) => {
 
     res.json({
       transactions,
-      pagination: {
-        page: parseInt(page),
-        limit: parseInt(limit),
-        total,
-        totalPages: Math.ceil(total / parseInt(limit))
-      }
+      total,
+      totalPages: Math.ceil(total / parseInt(limit)),
+      page: parseInt(page),
+      limit: parseInt(limit)
     });
   } catch (error) {
     console.error('Get transactions error:', error);
     res.status(500).json({ error: 'Server error fetching transactions' });
+  }
+});
+
+router.get('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.userId;
+
+    const transaction = await prisma.transaction.findUnique({
+      where: { id: parseInt(id) }
+    });
+
+    if (!transaction) {
+      return res.status(404).json({ error: 'Transaction not found' });
+    }
+
+    if (transaction.userId !== userId) {
+      return res.status(403).json({ error: 'Unauthorized' });
+    }
+
+    res.json(transaction);
+  } catch (error) {
+    console.error('Get transaction error:', error);
+    res.status(500).json({ error: 'Server error fetching transaction' });
   }
 });
 

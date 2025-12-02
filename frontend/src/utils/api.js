@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
 
 export const api = {
   // Auth endpoints
@@ -29,13 +29,25 @@ export const api = {
     return handleResponse(response);
   },
 
-  createTransaction: async (transactionData) => {
+  getTransaction: async (id) => {
+    const response = await fetch(`${API_URL}/api/transactions/${id}`, {
+      headers: getAuthHeaders()
+    });
+    return handleResponse(response);
+  },
+
+  addTransaction: async (transactionData) => {
     const response = await fetch(`${API_URL}/api/transactions`, {
       method: 'POST',
       headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
       body: JSON.stringify(transactionData)
     });
     return handleResponse(response);
+  },
+
+  // Alias for addTransaction
+  createTransaction: async (transactionData) => {
+    return api.addTransaction(transactionData);
   },
 
   updateTransaction: async (id, transactionData) => {
@@ -74,7 +86,10 @@ const handleResponse = async (response) => {
   const data = await response.json();
   
   if (!response.ok) {
-    throw new Error(data.error || 'Something went wrong');
+    const error = new Error(data.error || 'Something went wrong');
+    error.data = data;
+    error.status = response.status;
+    throw error;
   }
   
   return data;

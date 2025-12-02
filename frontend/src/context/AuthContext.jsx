@@ -1,4 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
+import api from '../utils/api';
 
 const AuthContext = createContext(null);
 
@@ -19,11 +20,22 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
-  const login = (userData, authToken) => {
-    localStorage.setItem('token', authToken);
-    localStorage.setItem('user', JSON.stringify(userData));
-    setToken(authToken);
-    setUser(userData);
+  const login = async (email, password) => {
+    const response = await api.login({ email, password });
+    localStorage.setItem('token', response.token);
+    localStorage.setItem('user', JSON.stringify(response.user));
+    setToken(response.token);
+    setUser(response.user);
+    return response;
+  };
+
+  const register = async (name, email, password) => {
+    const response = await api.register({ name, email, password });
+    localStorage.setItem('token', response.token);
+    localStorage.setItem('user', JSON.stringify(response.user));
+    setToken(response.token);
+    setUser(response.user);
+    return response;
   };
 
   const logout = () => {
@@ -38,6 +50,7 @@ export const AuthProvider = ({ children }) => {
     token,
     loading,
     login,
+    register,
     logout,
     isAuthenticated: !!token
   };

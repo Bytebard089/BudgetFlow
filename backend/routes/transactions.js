@@ -13,7 +13,8 @@ router.get('/', async (req, res) => {
       type,          
       startDate,
       endDate,
-      search,       
+      search,
+      category,
       sortBy = 'date', 
       sortOrder = 'desc',
       page = 1,
@@ -27,6 +28,10 @@ router.get('/', async (req, res) => {
 
     if (type) {
       where.type = type;
+    }
+
+    if (category) {
+      where.category = category;
     }
 
     if (startDate || endDate) {
